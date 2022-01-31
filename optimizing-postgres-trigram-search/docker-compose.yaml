@@ -1,0 +1,31 @@
+version: '2'
+
+services:
+  postgres:
+    container_name: postgres
+    image: bitnami/postgresql:14.1.0
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRESQL_USERNAME=demo
+      - POSTGRESQL_DATABASE=demo
+      - POSTGRESQL_PASSWORD=changeme
+      - POSTGRESQL_POSTGRES_PASSWORD=changeme
+
+  load-data:
+    container_name: load-data
+    build:
+      context: data
+      dockerfile: Dockerfile
+    volumes:
+      - './data:/mnt/data'
+    environment:
+      - PGHOST=postgres
+      - PGUSER=demo
+      - PGDATABASE=demo
+      - PGPASSWORD=changeme
+      - PGPORT=5432
+    command: '/mnt/data/load.sh'
+    depends_on:
+      - postgres
+
