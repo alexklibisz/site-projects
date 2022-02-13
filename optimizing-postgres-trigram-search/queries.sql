@@ -1,3 +1,5 @@
+-- The Test Environment --
+
 -- This disables parallel gathers, as I've found they produce highly
 -- variable results depending on the host system.
 set max_parallel_workers_per_gather = 0;
@@ -6,6 +8,8 @@ set max_parallel_workers_per_gather = 0;
 -- instead of another strategy. I've found this will generally improve
 -- performance on any system with an SSD.
 set random_page_cost = 0.9;
+
+-- Baseline --
 
 with input as (select 'abc' as text1, 'abb' as text2)
 select
@@ -37,6 +41,8 @@ select review_id,
 from reviews, input
 where input.q % summary -- (2)
 order by input.q <-> summary limit 10; -- (3)
+
+-- Indexing --
 
 create index reviews_summary_trgm_gist_idx on reviews
   using gist(summary gist_trgm_ops(siglen=64));
@@ -79,8 +85,35 @@ from reviews, input
 where input.q % summary -- (2)
 order by input.q <-> summary limit 10; -- (3)
 
--- Table and index sizes thanks to:
--- https://gist.github.com/kevinjom/628bac642a424b8b7ca43ed77171b506
+-- Separate Exact Queries from Fuzzy Queries --
+explain (analyze, buffers)
+with input as (select 'Michael Lewis' as q)
+select review_id,
+       1.0 as score -- (3)
+from reviews, input
+where summary ilike '%' || input.q || '%' -- (1)
+limit 10; -- (2)
+
+explain (analyze, buffers)
+with input as (select 'Michael Louis' as q)
+select review_id,
+       1.0 as score -- (1)
+from reviews, input
+where summary ilike '%' || input.q || '%' -- (2)
+limit 10; -- (3)
+
+-- One Query for All Searchable Columns --
+create index reviews_reviewer_id_trgm_gist_idx on reviews
+  using gist(reviewer_id gist_trgm_ops(siglen=256));
+create index reviews_reviewer_name_trgm_gist_idx on reviews
+  using gist(reviewer_name gist_trgm_ops(siglen=256));
+create index reviews_asin_trgm_gist_idx on reviews
+  using gist(asin gist_trgm_ops(siglen=256));
+vacuum analyze reviews;
+
+
+-- Table and index sizes.
+-- Credit to: https://gist.github.com/kevinjom/628bac642a424b8b7ca43ed77171b506
 SELECT
     t.tablename,
     indexname,
