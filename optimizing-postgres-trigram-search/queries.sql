@@ -38,7 +38,8 @@ from reviews, input
 where input.q % summary -- (2)
 order by input.q <-> summary limit 10; -- (3)
 
-create index reviews_summary_trgm_gist_idx on reviews using gist(summary gist_trgm_ops(siglen=64));
+create index reviews_summary_trgm_gist_idx on reviews
+  using gist(summary gist_trgm_ops(siglen=64));
 vacuum analyze reviews;
 
 explain (analyze, buffers)
@@ -58,7 +59,8 @@ where input.q % summary -- (2)
 order by input.q <-> summary limit 10; -- (3)
 
 drop index reviews_summary_trgm_gist_idx;
-create index reviews_summary_trgm_gist_idx on reviews using gist(summary gist_trgm_ops(siglen=256));
+create index reviews_summary_trgm_gist_idx on reviews
+  using gist(summary gist_trgm_ops(siglen=256));
 vacuum analyze reviews;
 
 explain (analyze, buffers)
