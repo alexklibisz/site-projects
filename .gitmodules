@@ -1,0 +1,3 @@
+[submodule "pev2/pev2"]
+	path = pev2/pev2
+	url = git@github.com:dalibo/pev2.git
