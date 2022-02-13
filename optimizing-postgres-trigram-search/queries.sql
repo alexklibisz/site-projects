@@ -86,6 +86,12 @@ where input.q % summary -- (2)
 order by input.q <-> summary limit 10; -- (3)
 
 -- Separate Exact Queries from Fuzzy Queries --
+select
+   'abc' ilike '%' || 'ab' || '%' as "abc contains ab",
+   'abc' ilike '%' || 'AB' || '%' as "abc contains AB",
+   'abc' ilike '%' || 'abc' || '%' as "abc contains abc",
+   'abc' ilike '%' || 'abb' || '%' as "abc contains abb";
+
 explain (analyze, buffers)
 with input as (select 'Michael Lewis' as q)
 select review_id,
@@ -110,6 +116,130 @@ create index reviews_reviewer_name_trgm_gist_idx on reviews
 create index reviews_asin_trgm_gist_idx on reviews
   using gist(asin gist_trgm_ops(siglen=256));
 vacuum analyze reviews;
+
+explain (analyze, buffers)
+with input as (select 'Michael Lewis' as q)
+(select review_id, 1.0 - (reviewer_id <-> input.q) as score
+from reviews, input
+where input.q % reviewer_id
+order by input.q <-> reviewer_id limit 10)
+union all
+(select review_id, 1.0 - (reviewer_name <-> input.q) as score
+from reviews, input
+where input.q % reviewer_name
+order by input.q <-> reviewer_name limit 10)
+union all
+(select review_id, 1.0 - (summary <-> input.q) as score
+from reviews, input
+where input.q % summary
+order by input.q <-> summary limit 10)
+union all
+(select review_id, 1.0 - (asin <-> input.q) as score
+from reviews, input
+where input.q % asin
+order by input.q <-> asin limit 10);
+
+explain (analyze, buffers)
+with input as (select 'Michael Lewis' as q)
+(select review_id, 1.0 as score
+from reviews, input
+where reviewer_id ilike '%' || input.q || '%'
+limit 10)
+union all
+(select review_id, 1.0 as score
+from reviews, input
+where reviewer_name ilike '%' || input.q || '%'
+limit 10)
+union all
+(select review_id, 1.0 as score
+from reviews, input
+where summary ilike '%' || input.q || '%'
+limit 10)
+union all
+(select review_id, 1.0 as score
+from reviews, input
+where asin ilike '%' || input.q || '%'
+limit 10);
+
+explain (analyze, buffers)
+with input as (select 'Michael Louis' as q)
+(select review_id, 1.0 - (reviewer_id <-> input.q) as score
+from reviews, input
+where input.q % reviewer_id
+order by input.q <-> reviewer_id limit 10)
+union all
+(select review_id, 1.0 - (reviewer_name <-> input.q) as score
+from reviews, input
+where input.q % reviewer_name
+order by input.q <-> reviewer_name limit 10)
+union all
+(select review_id, 1.0 - (summary <-> input.q) as score
+from reviews, input
+where input.q % summary
+order by input.q <-> summary limit 10)
+union all
+(select review_id, 1.0 - (asin <-> input.q) as score
+from reviews, input
+where input.q % asin
+order by input.q <-> asin limit 10);
+
+explain (analyze, buffers)
+with input as (select 'Michael Louis' as q)
+(select review_id, 1.0 as score
+from reviews, input
+where reviewer_id ilike '%' || input.q || '%'
+limit 10)
+union all
+(select review_id, 1.0 as score
+from reviews, input
+where reviewer_name ilike '%' || input.q || '%'
+limit 10)
+union all
+(select review_id, 1.0 as score
+from reviews, input
+where summary ilike '%' || input.q || '%'
+limit 10)
+union all
+(select review_id, 1.0 as score
+from reviews, input
+where asin ilike '%' || input.q || '%'
+limit 10);
+
+
+
+explain (analyze, buffers)
+with input as (select 'Michael Lewis' as q)
+select review_id,
+       (1 - least(
+        input.q <-> reviewer_id,
+        input.q <-> reviewer_name,
+        input.q <-> summary,
+        input.q <-> asin)) as score -- (3)
+from reviews, input
+where input.q % reviewer_id
+   or input.q % reviewer_name
+   or input.q % summary
+   or input.q % asin -- (1)
+order by least(
+    input.q <-> reviewer_id,
+    input.q <-> reviewer_name,
+    input.q <-> summary,
+    input.q <-> asin) limit 10; -- (2)
+
+explain (analyze, buffers)
+with input as (select 'Michael Lewis' as q)
+select review_id,
+       1.0 as score
+from reviews, input
+where input.q % reviewer_id
+   or input.q % reviewer_name
+   or input.q % summary
+   or input.q % asin
+order by least(
+    input.q <-> reviewer_id,
+    input.q <-> reviewer_name,
+    input.q <-> summary,
+    input.q <-> asin) limit 10;
 
 
 -- Table and index sizes.
@@ -137,124 +267,3 @@ LEFT OUTER JOIN
     ON t.tablename = foo.ctablename
 WHERE t.schemaname='public'
 ORDER BY 1,2;
-
---- JUNK ---
-SHOW ALL;
-
-select * from reviews
-
-explain (analyze, buffers)
-with input as (select 'Michael Lewis' as q) -- (1)
-select review_id, reviewer_id, reviewer_name, summary, asin,
-       (1 - least(
-        input.q <-> reviewer_id,
-        input.q <-> reviewer_name,
-        input.q <-> summary,
-        input.q <-> asin)) as score -- (4)
-from reviews, input
-where input.q % reviewer_id -- (2)
-   or input.q % reviewer_name
-   or input.q % summary
-   or input.q % asin
-order by least(
-    input.q <-> reviewer_id,
-    input.q <-> reviewer_name,
-    input.q <-> summary,
-    input.q <-> asin)
-limit 10; -- (3)
-
-select
-   'abc' ilike '%' || 'ab' || '%' as "abc contains ab",
-   'abc' ilike '%' || 'AB' || '%' as "abc contains AB",
-   'abc' ilike '%' || 'abc' || '%' as "abc contains abc",
-   'abc' ilike '%' || 'abb' || '%' as "abc contains abb";
-
-explain (analyze, buffers)
-with input as (select 'Michael Lewis' as q)
-select review_id, 1.0 as score
-from reviews, input
-where summary ilike '%' || input.q || '%'
-limit 10;
-
-explain (analyze, buffers)
-with input as (select 'Michael Louis' as q)
-select review_id, 1.0 as score
-from reviews, input
-where summary ilike '%' || input.q || '%'
-limit 10;
-
-
-with input as (select 'kindel' as q)
-select review_id,
-       1 - least(
-       input.q <<-> reviewer_id,
-       input.q <<-> asin,
-       input.q <<-> reviewer_name,
-       input.q <<-> summary
-       ) as score
-from reviews, input
-where input.q <% reviewer_id
-   or input.q <% asin
-   or input.q <% reviews.reviewer_name
-   or input.q <% summary
-order by
-    least(
-       input.q <<-> reviewer_id,
-       input.q <<-> asin,
-       input.q <<-> reviewer_name,
-       input.q <<-> summary
-    )
-limit 100;
-
-
-create index reviews_reviewer_id_trgm_gist_idx on reviews using gist(reviewer_id gist_trgm_ops);
-create index reviews_asin_trgm_gist_idx on reviews using gist(asin gist_trgm_ops);
-create index reviews_reviewer_name_trgm_gist_idx on reviews using gist(reviewer_name gist_trgm_ops);
-create index reviews_summary_trgm_gist_idx on reviews using gist(summary gist_trgm_ops);
-
-explain analyze
-with input as (select 'kindel' as q)
-select review_id,
-       1 - least(
-       input.q <<-> reviewer_id,
-       input.q <<-> asin,
-       input.q <<-> reviewer_name,
-       input.q <<-> summary
-       ) as score
-from reviews, input
-where input.q <% reviewer_id
-   or input.q <% asin
-   or input.q <% reviews.reviewer_name
-   or input.q <% summary
-order by
-    least(
-       input.q <<-> reviewer_id,
-       input.q <<-> asin,
-       input.q <<-> reviewer_name,
-       input.q <<-> summary
-    )
-limit 100;
-
-with input as (select 'kindel' as q)
-select review_id,
-       1 - (input.q <<-> asin) as score
-from reviews, input
-where input.q <% asin
-order by input.q <<-> asin
-limit 100;
-
-explain analyse
-with input as (select 'kindle' as q)
-select review_id,
-       1 - (input.q <<-> asin) as score
-from reviews, input
-where input.q <% asin
-order by input.q <<-> asin
-limit 100;
-
-explain analyse
-with input as (select 'kindle' as q)
-select review_id, 1.0 as score
-from reviews, input
-where asin ilike '%' || input.q || '%'
-limit 100;
