@@ -4,8 +4,13 @@ services:
   postgres:
     container_name: postgres
     image: bitnami/postgresql:14.1.0
+    volumes:
+      # This conf gets layered on top of default conf.
+      - './postgresql.conf:/opt/bitnami/postgresql/conf/conf.d/postgresql.conf'
+      - './data/postgresql:/bitnami/postgresql'
     ports:
       - 5432:5432
+    shm_size: 1g
     environment:
       - POSTGRESQL_USERNAME=demo
       - POSTGRESQL_DATABASE=demo

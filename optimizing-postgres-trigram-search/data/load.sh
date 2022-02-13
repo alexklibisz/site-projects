@@ -6,8 +6,8 @@ pg_isready -h $PGHOST -p $PGPORT || sleep 5
 pg_isready -h $PGHOST -p $PGPORT
 
 time psql -v ON_ERROR_STOP=1 <<END_OF_SQL
-create extension pg_trgm;
-create unlogged table reviews (
+create extension if not exists pg_trgm;
+create unlogged table if not exists reviews (
   review_id bigserial primary key,
   reviewer_id varchar(50),
   reviewer_name varchar(100),
