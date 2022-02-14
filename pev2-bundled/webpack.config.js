@@ -4,7 +4,7 @@ const VueLoaderPlugin = require("vue-loader/lib/plugin");
 
 module.exports = {
   entry: {
-    "hello": "./vue/loaders/helloLoader.js",
+    "pev2": "./vue/loaders/pev2Loader.js",
   },
   output: {
     filename: "bundle.js",
