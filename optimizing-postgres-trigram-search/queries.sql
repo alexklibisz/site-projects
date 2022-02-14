@@ -205,8 +205,6 @@ from reviews, input
 where asin ilike '%' || input.q || '%'
 limit 10);
 
-
-
 explain (analyze, buffers)
 with input as (select 'Michael Lewis' as q)
 select review_id,
@@ -241,6 +239,34 @@ order by least(
     input.q <-> summary,
     input.q <-> asin) limit 10;
 
+--- WIP ---
+
+-- 15min
+create index reviews_searchable_text_trgm_gist_idx on reviews
+  using gist((
+      coalesce(asin, '') || ' ' ||
+      coalesce(reviewer_id, '') || ' ' ||
+      coalesce(reviewer_name, '') || ' ' ||
+      coalesce(summary, ''))  gist_trgm_ops(siglen=256));
+
+explain (analyze, buffers)
+with input as (select 'Michael Louis' as q)
+select review_id, summary, reviewer_name,
+      1 - (input.q <<-> (coalesce(asin, '') || ' ' ||
+      coalesce(reviewer_id, '') || ' ' ||
+      coalesce(reviewer_name, '') || ' ' ||
+      coalesce(summary, ''))) as score
+from reviews, input
+where input.q <% (coalesce(asin, '') || ' ' ||
+      coalesce(reviewer_id, '') || ' ' ||
+      coalesce(reviewer_name, '') || ' ' ||
+      coalesce(summary, ''))
+order by input.q <<-> (coalesce(asin, '') || ' ' ||
+      coalesce(reviewer_id, '') || ' ' ||
+      coalesce(reviewer_name, '') || ' ' ||
+      coalesce(summary, '')) limit 10;
+
+--- WIP ---
 
 -- Table and index sizes.
 -- Credit to: https://gist.github.com/kevinjom/628bac642a424b8b7ca43ed77171b506
@@ -267,3 +293,8 @@ LEFT OUTER JOIN
     ON t.tablename = foo.ctablename
 WHERE t.schemaname='public'
 ORDER BY 1,2;
+
+
+---
+explain analyze
+select * from reviews limit 10;
