@@ -6,7 +6,7 @@
 	<title>Vue Bundle</title>
 	<link href="https://unpkg.com/bootstrap@4.5.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
 	<link href="https://unpkg.com/@fortawesome/fontawesome-free@5.13.0/css/all.css" rel="stylesheet"/>
-	<script src="bundle.js" defer></script>
+	<script src="vue-components.js" defer></script>
 </head>
 <body>
 <div data-vue-component="pev2">
@@ -30,20 +30,32 @@ WHERE t1.unique1 < 10 AND t1.unique2 = t2.unique2;
 
 <div data-vue-component="pev2">
 	<pre>
-SELECT * FROM tenk1 t1, tenk3 t2 
-WHERE t1.unique1 < 10 AND t1.unique2 = t2.unique2;
+with input as (select 'Michael Louis' as q)
+select review_id, summary, reviewer_name,
+      1 - (input.q <<-> (coalesce(asin, '') || ' ' ||
+      coalesce(reviewer_id, '') || ' ' ||
+      coalesce(reviewer_name, '') || ' ' ||
+      coalesce(summary, ''))) as score
+from reviews, input
+where input.q <% (coalesce(asin, '') || ' ' ||
+      coalesce(reviewer_id, '') || ' ' ||
+      coalesce(reviewer_name, '') || ' ' ||
+      coalesce(summary, ''))
+order by input.q <<-> (coalesce(asin, '') || ' ' ||
+      coalesce(reviewer_id, '') || ' ' ||
+      coalesce(reviewer_name, '') || ' ' ||
+      coalesce(summary, '')) limit 10;
 	</pre>
 	<pre>
-                                                           QUERY PLAN
----------------------------------------------------------------------------------------------------------------------------------
- Nested Loop  (cost=4.33..118.25 rows=10 width=488) (actual time=0.370..1.126 rows=10 loops=1)
-   ->  Bitmap Heap Scan on tenk1 t1  (cost=4.33..39.44 rows=10 width=244) (actual time=0.254..0.380 rows=10 loops=1)
-         Recheck Cond: (unique1 < 10)
-         ->  Bitmap Index Scan on tenk1_unique1  (cost=0.00..4.33 rows=10 width=0) (actual time=0.164..0.164 rows=10 loops=1)
-               Index Cond: (unique1 < 10)
-   ->  Index Scan using tenk3_unique2 on tenk3 t2  (cost=0.00..7.87 rows=1 width=244) (actual time=0.041..0.048 rows=1 loops=10)
-         Index Cond: (unique2 = t1.unique2)
- Total runtime: 3.114 ms
+Limit  (cost=0.42..7.82 rows=10 width=62) (actual time=6.021..113.256 rows=10 loops=1)
+  Buffers: shared hit=5094
+  ->  Index Scan using reviews_searchable_text_trgm_gist_idx on reviews  (cost=0.42..65909.97 rows=88980 width=62) (actual time=6.019..113.245 rows=10 loops=1)
+"        Index Cond: ((((((((COALESCE(asin, ''::character varying))::text || ' '::text) || (COALESCE(reviewer_id, ''::character varying))::text) || ' '::text) || (COALESCE(reviewer_name, ''::character varying))::text) || ' '::text) || (COALESCE(summary, ''::character varying))::text) %> 'Michael Louis'::text)"
+        Rows Removed by Index Recheck: 3
+"        Order By: ((((((((COALESCE(asin, ''::character varying))::text || ' '::text) || (COALESCE(reviewer_id, ''::character varying))::text) || ' '::text) || (COALESCE(reviewer_name, ''::character varying))::text) || ' '::text) || (COALESCE(summary, ''::character varying))::text) <->> 'Michael Louis'::text)"
+        Buffers: shared hit=5094
+Planning Time: 0.170 ms
+Execution Time: 113.316 ms
 	</pre>
 </div>
 </body>

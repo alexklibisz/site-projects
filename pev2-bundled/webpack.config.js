@@ -7,7 +7,7 @@ module.exports = {
     "pev2": "./vue/loaders/pev2Loader.js",
   },
   output: {
-    filename: "bundle.js",
+    filename: "vue-components.js",
     path: __dirname,
   },
   module: {
@@ -21,12 +21,6 @@ module.exports = {
       {
         test: /\.js$/,
         loader: "babel-loader",
-      },
-      // this will apply to both plain `.css` files
-      // AND `<style>` blocks in `.vue` files
-      {
-        test: /\.css$/,
-        use: ["vue-style-loader", "css-loader"],
       },
     ],
   },

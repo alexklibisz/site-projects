@@ -5,13 +5,10 @@
 <script>
 import pev2 from "pev2";
 export default {
-  data: {
-    plan: "",
-    query: ""
+  data() {
+    return { plan: null, query: null }
   },
-  components: {
-    pev2
-  }
+  components: { pev2 }
 };
 </script>
 

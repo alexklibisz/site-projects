@@ -251,7 +251,7 @@ create index reviews_searchable_text_trgm_gist_idx on reviews
 
 explain (analyze, buffers)
 with input as (select 'Michael Louis' as q)
-select review_id, summary, reviewer_name,
+select review_id,
       1 - (input.q <<-> (coalesce(asin, '') || ' ' ||
       coalesce(reviewer_id, '') || ' ' ||
       coalesce(reviewer_name, '') || ' ' ||
