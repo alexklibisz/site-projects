@@ -12,4 +12,8 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+  div.plan-container {
+    height: 420px;
+  }
+</style>
