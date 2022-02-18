@@ -9,6 +9,10 @@ set max_parallel_workers_per_gather = 0;
 -- performance on any system with an SSD.
 set random_page_cost = 0.9;
 
+-- Explain (Analyze, Buffers) --
+explain (analyze, buffers)
+select count(review_id) from reviews;
+
 -- Baseline --
 
 with input as (select 'abc' as text1, 'abb' as text2)
@@ -85,7 +89,7 @@ from reviews, input
 where input.q % summary -- (2)
 order by input.q <-> summary limit 10; -- (3)
 
--- Separate Exact Queries from Fuzzy Queries --
+-- Separate Exact and Trigram Queries --
 select
    'abc' ilike '%' || 'ab' || '%' as "abc contains ab",
    'abc' ilike '%' || 'AB' || '%' as "abc contains AB",
@@ -109,6 +113,9 @@ where summary ilike '%' || input.q || '%' -- (2)
 limit 10; -- (3)
 
 -- One Query for All Searchable Columns --
+
+--- Four Single-Column Queries ---
+
 create index reviews_reviewer_id_trgm_gist_idx on reviews
   using gist(reviewer_id gist_trgm_ops(siglen=256));
 create index reviews_reviewer_name_trgm_gist_idx on reviews
@@ -205,6 +212,8 @@ from reviews, input
 where asin ilike '%' || input.q || '%'
 limit 10);
 
+--- One Four-Column Query with Disjunctions ---
+
 explain (analyze, buffers)
 with input as (select 'Michael Lewis' as q)
 select review_id,
@@ -229,6 +238,21 @@ with input as (select 'Michael Lewis' as q)
 select review_id,
        1.0 as score
 from reviews, input
+where reviewer_id ilike '%' || input.q || '%'
+   or reviewer_name ilike '%' || input.q || '%'
+   or summary ilike '%' || input.q || '%'
+   or asin ilike '%' || input.q || '%'
+limit 10;
+
+explain (analyze, buffers)
+with input as (select 'Michael Louis' as q)
+select review_id,
+       (1 - least(
+        input.q <-> reviewer_id,
+        input.q <-> reviewer_name,
+        input.q <-> summary,
+        input.q <-> asin)) as score
+from reviews, input
 where input.q % reviewer_id
    or input.q % reviewer_name
    or input.q % summary
@@ -239,7 +263,30 @@ order by least(
     input.q <-> summary,
     input.q <-> asin) limit 10;
 
---- WIP ---
+explain (analyze, buffers)
+with input as (select 'Michael Louis' as q)
+select review_id,
+       1.0 as score
+from reviews, input
+where reviewer_id ilike '%' || input.q || '%'
+   or reviewer_name ilike '%' || input.q || '%'
+   or summary ilike '%' || input.q || '%'
+   or asin ilike '%' || input.q || '%'
+limit 10;
+
+--- One Four-Column Query with an Expression Index ---
+
+select text1, text2, similarity(text1, text2), word_similarity(text1, text2)
+from
+(values ('louis', 'lewis'),
+        ('louis', 'a lewis c'),
+        ('louis', 'aa lewis cc'),
+        ('louis', 'aaa lewis ccc')) v(text1, text2);
+
+
+      SELECT v.*
+FROM (VALUES (1), (2), (3), (4)) v(foo)
+WHERE foo NOT IN ( SELECT id from table );
 
 -- 15min
 create index reviews_searchable_text_trgm_gist_idx on reviews
@@ -248,6 +295,23 @@ create index reviews_searchable_text_trgm_gist_idx on reviews
       coalesce(reviewer_id, '') || ' ' ||
       coalesce(reviewer_name, '') || ' ' ||
       coalesce(summary, ''))  gist_trgm_ops(siglen=256));
+
+explain (analyze, buffers)
+with input as (select 'Michael Lewis' as q)
+select review_id,
+      1 - (input.q <<-> (coalesce(asin, '') || ' ' ||
+      coalesce(reviewer_id, '') || ' ' ||
+      coalesce(reviewer_name, '') || ' ' ||
+      coalesce(summary, ''))) as score                    -- (3)
+from reviews, input
+where input.q <% (coalesce(asin, '') || ' ' ||
+      coalesce(reviewer_id, '') || ' ' ||
+      coalesce(reviewer_name, '') || ' ' ||
+      coalesce(summary, ''))                              -- (1)
+order by input.q <<-> (coalesce(asin, '') || ' ' ||
+      coalesce(reviewer_id, '') || ' ' ||
+      coalesce(reviewer_name, '') || ' ' ||
+      coalesce(summary, '')) limit 10;                    -- (2)
 
 explain (analyze, buffers)
 with input as (select 'Michael Louis' as q)
@@ -265,6 +329,28 @@ order by input.q <<-> (coalesce(asin, '') || ' ' ||
       coalesce(reviewer_id, '') || ' ' ||
       coalesce(reviewer_name, '') || ' ' ||
       coalesce(summary, '')) limit 10;
+
+explain (analyze, buffers)
+with input as (select 'Michael Lewis' as q)
+select review_id,
+      1.0 as score
+from reviews, input
+where (coalesce(asin, '') || ' ' ||
+      coalesce(reviewer_id, '') || ' ' ||
+      coalesce(reviewer_name, '') || ' ' ||
+      coalesce(summary, '')) ilike '%' || input.q || '%'
+limit 10;
+
+explain (analyze, buffers)
+with input as (select 'Michael Louis' as q)
+select review_id,
+      1.0 as score
+from reviews, input
+where (coalesce(asin, '') || ' ' ||
+      coalesce(reviewer_id, '') || ' ' ||
+      coalesce(reviewer_name, '') || ' ' ||
+      coalesce(summary, '')) ilike '%' || input.q || '%'
+limit 10;
 
 --- WIP ---
 
