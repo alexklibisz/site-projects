@@ -2,4 +2,3 @@
 *.json
 postgresql/*
 !postgresql/.keep
-

@@ -352,8 +352,6 @@ where (coalesce(asin, '') || ' ' ||
       coalesce(summary, '')) ilike '%' || input.q || '%'
 limit 10;
 
---- WIP ---
-
 -- Table and index sizes.
 -- Credit to: https://gist.github.com/kevinjom/628bac642a424b8b7ca43ed77171b506
 SELECT
@@ -379,8 +377,3 @@ LEFT OUTER JOIN
     ON t.tablename = foo.ctablename
 WHERE t.schemaname='public'
 ORDER BY 1,2;
-
-
----
-explain analyze
-select * from reviews limit 10;
