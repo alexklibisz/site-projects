@@ -1,0 +1,4 @@
+*.json.gz
+*.json
+postgresql/*
+!postgresql/.keep
