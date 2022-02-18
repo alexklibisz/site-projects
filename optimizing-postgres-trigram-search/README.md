@@ -1,0 +1,1 @@
+[Optimizing Postgres Trigram Search](https://alexklibisz.com/2022/02/16/optimizing-postgres-trigram-search.html)
