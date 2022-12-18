@@ -1,10 +1,10 @@
 -- +goose Up
 create table post (
-	post_id serial PRIMARY KEY,
-	post_uuid uuid UNIQUE NOT NULL,
-	contents TEXT NOT NULL,
-	created_at TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP
+	post_id serial primary key,
+	post_uuid uuid unique not null,
+	contents text not null,
+	created_at timestamp not null,
+    updated_at timestamp
 );
 -- +goose Down
 drop table post;

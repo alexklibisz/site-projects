@@ -8,7 +8,6 @@ services:
       - 'queries_vs_functions_postgres_data:/bitnami/postgresql'
     ports:
       - 5432:5432
-    shm_size: 1g
     mem_limit: 8g
     mem_reservation: 8g
     cpus: 1
