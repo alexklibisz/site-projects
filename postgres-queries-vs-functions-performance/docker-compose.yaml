@@ -27,14 +27,17 @@ services:
     image: gomicro/goose:3.7.0
     volumes:
       - './migrations:/migrations'
-    command: 
-      - goose 
-      - postgres 
-      - "host=postgres user=demo password=changeme dbname=demo sslmode=disable"
-      - up
+      - './migrate.sh:/migrate.sh'
+    command: "/migrate.sh"
     depends_on:
       postgres:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "ls", "/tmp/ready.txt"]
+      interval: 10s
+      timeout: 1s
+      retries: 10
+      start_period: 5s
 
 volumes:
   queries_vs_functions_postgres_data:

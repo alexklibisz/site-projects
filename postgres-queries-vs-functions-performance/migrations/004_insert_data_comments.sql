@@ -6,6 +6,6 @@ select gen_random_uuid(),
        now(),
        null
 from post
-cross join generate_series(1, 100) as comment_number;
+cross join generate_series(1, 10) as comment_number;
 -- +goose Down
 delete from comment;
