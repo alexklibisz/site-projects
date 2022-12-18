@@ -1,0 +1,3 @@
+[submodule "sbt-build-test-caching/cats"]
+	path = sbt-build-test-caching/cats
+	url = git@github.com:typelevel/cats.git
