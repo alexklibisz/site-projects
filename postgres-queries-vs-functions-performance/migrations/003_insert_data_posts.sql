@@ -4,7 +4,7 @@ select gen_random_uuid(),
        md5(post_number::text),
        now(),
        null
-from generate_series(1, 20000) post_number;
+from generate_series(1, 30000) post_number;
 
 -- +goose Down
 delete from post;

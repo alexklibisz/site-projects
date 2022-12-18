@@ -26,7 +26,7 @@ curr = conn.cursor()
 curr.execute(query_select_post_uuids)
 post_uuids = sorted([uuid for (uuid, ) in curr.fetchall()])
 
-for post_uuid in tqdm(post_uuids):
+for post_uuid in tqdm(post_uuids, desc=query_or_function, bar_format='{l_bar}{bar:10}{r_bar}{bar:-10b}'):
     curr.execute(query_select_comments, (post_uuid,))
     comment_counts = curr.fetchone()
 
