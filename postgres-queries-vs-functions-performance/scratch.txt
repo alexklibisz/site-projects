@@ -1,6 +1,0 @@
-- create a not-entirely-small postgres database
-- create a stored function for querying the data
-- write an equivalent query for querying the data
-- write a benchmark container that calls the stored function in a tight loop
-- write a benchmark container that that calls the query in a tight loop
-- wire up some sort of metrics exporter to inspect cpu, network, memory of the benchmark and database containers

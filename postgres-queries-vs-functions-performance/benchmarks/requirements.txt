@@ -1,2 +1,4 @@
 psycopg2-binary==2.9.5
 tqdm==4.64.1
+pandas==1.5.2
+matplotlib==3.6.2
