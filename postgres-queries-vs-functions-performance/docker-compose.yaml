@@ -1,4 +1,4 @@
-version: '3.8'
+version: '2'
 
 services:
   postgres:
@@ -10,6 +10,7 @@ services:
       - 5432:5432
     shm_size: 1g
     mem_limit: 8g
+    mem_reservation: 8g
     cpus: 1
     environment:
       - POSTGRESQL_USERNAME=demo
