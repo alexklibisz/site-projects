@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: bitnami/postgresql:15.1.0
+    volumes:
+      - './postgresql.conf:/opt/bitnami/postgresql/conf/conf.d/postgresql.conf'
+      - 'queries_vs_functions_postgres_data:/bitnami/postgresql'
+    ports:
+      - 5432:5432
+    shm_size: 1g
+    mem_limit: 8g
+    cpus: 1
+    environment:
+      - POSTGRESQL_USERNAME=demo
+      - POSTGRESQL_DATABASE=demo
+      - POSTGRESQL_PASSWORD=changeme
+      - POSTGRESQL_POSTGRES_PASSWORD=changeme
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "localhost", "-p", "5432", "-U", "demo"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
+  goose:
+    image: gomicro/goose:3.7.0
+    volumes:
+      - './migrations:/migrations'
+    command: 
+      - goose 
+      - postgres 
+      - "host=postgres user=demo password=changeme dbname=demo sslmode=disable"
+      - up
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  queries_vs_functions_postgres_data:
+    name: queries_vs_functions_postgres_data
+    driver: local
