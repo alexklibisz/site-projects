@@ -31,8 +31,8 @@ def get_lim(s1, s2):
         max(max(s1), max(s2)) * 1.1
     )
 
-dff = munge_dataframe(pd.read_csv(f'stats-function.csv'))
-dfq = munge_dataframe(pd.read_csv(f'stats-query.csv'))
+dff = munge_dataframe(pd.read_csv(f'metrics-function.csv'))
+dfq = munge_dataframe(pd.read_csv(f'metrics-query.csv'))
 
 fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(20, 10))
 plt.suptitle("Are Postgres functions faster than queries?\n\nhttps://alexklibisz.com/2022/12/18/are-postgres-functions-faster-than-queries.html")
@@ -62,7 +62,7 @@ axes[1][0].set_ylabel('Network In (MB)')
 axes[1][0].set_ylim(get_lim(dff['Network In'], dfq['Network In']))
 axes[1][0].legend()
 axes[1][0].grid(visible=True)
-axes[1][0].set_title('Network In')
+axes[1][0].set_title('Network In (Cumulative)')
 
 axes[1][1].plot(dff['time'], dff['Network Out'], label='Function')
 axes[1][1].plot(dfq['time'], dfq['Network Out'], label='Query')
@@ -71,6 +71,6 @@ axes[1][1].set_ylabel('Network Out (MB)')
 axes[1][1].set_ylim(get_lim(dff['Network Out'], dfq['Network Out']))
 axes[1][1].legend()
 axes[1][1].grid(visible=True)
-axes[1][1].set_title('Network Out')
+axes[1][1].set_title('Network Out (Cumulative)')
 
-plt.savefig(f'stats.png')
+plt.savefig(f'metrics.png', bbox_inches='tight', pad_inches=0.1)
