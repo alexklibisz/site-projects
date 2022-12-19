@@ -1,0 +1,45 @@
+version: '2'
+
+services:
+  postgres:
+    image: bitnami/postgresql:15.1.0
+    volumes:
+      - './postgresql.conf:/opt/bitnami/postgresql/conf/conf.d/postgresql.conf'
+      - 'queries_vs_functions_postgres_data:/bitnami/postgresql'
+    ports:
+      - 5432:5432
+    mem_limit: 8g
+    mem_reservation: 8g
+    cpus: 1
+    environment:
+      - POSTGRESQL_USERNAME=demo
+      - POSTGRESQL_DATABASE=demo
+      - POSTGRESQL_PASSWORD=changeme
+      - POSTGRESQL_POSTGRES_PASSWORD=changeme
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "localhost", "-p", "5432", "-U", "demo"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
+  goose:
+    image: gomicro/goose:3.7.0
+    volumes:
+      - './migrations:/migrations'
+      - './migrate.sh:/migrate.sh'
+    command: "/migrate.sh"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "ls", "/tmp/ready.txt"]
+      interval: 10s
+      timeout: 1s
+      retries: 10
+      start_period: 5s
+
+volumes:
+  queries_vs_functions_postgres_data:
+    name: queries_vs_functions_postgres_data
+    driver: local
