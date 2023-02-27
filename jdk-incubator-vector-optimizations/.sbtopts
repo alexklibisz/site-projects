@@ -1,0 +1,2 @@
+# Needed to compile the jdk.incubator.vector code.
+-J--add-modules=jdk.incubator.vector
