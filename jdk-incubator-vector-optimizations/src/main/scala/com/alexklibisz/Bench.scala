@@ -2,6 +2,7 @@ package com.alexklibisz
 
 import org.openjdk.jmh.annotations._
 
+import java.util.concurrent.TimeUnit
 import scala.util.Random
 
 @State(Scope.Benchmark)
@@ -22,160 +23,160 @@ class Bench {
   @Benchmark
   @BenchmarkMode(Array(Mode.Throughput))
   @Fork(value = 1)
-  @Warmup(time = 5, iterations = 3)
-  @Measurement(time = 5, iterations = 6)
+  @Warmup(time = 5, iterations = 3, timeUnit = TimeUnit.SECONDS)
+  @Measurement(time = 5, iterations = 6, timeUnit = TimeUnit.SECONDS)
   def cosineSimilarityBaseline(f: BenchFixtures): Unit =
     f.baseline.cosineSimilarity(f.v1, f.v2)
 
   @Benchmark
   @BenchmarkMode(Array(Mode.Throughput))
   @Fork(value = 1)
-  @Warmup(time = 5, iterations = 3)
-  @Measurement(time = 5, iterations = 6)
+  @Warmup(time = 5, iterations = 3, timeUnit = TimeUnit.SECONDS)
+  @Measurement(time = 5, iterations = 6, timeUnit = TimeUnit.SECONDS)
   def cosineSimilarityFma(f: BenchFixtures): Unit =
     f.fma.cosineSimilarity(f.v1, f.v2)
 
   @Benchmark
   @BenchmarkMode(Array(Mode.Throughput))
   @Fork(value = 1)
-  @Warmup(time = 5, iterations = 3)
-  @Measurement(time = 5, iterations = 6)
+  @Warmup(time = 5, iterations = 3, timeUnit = TimeUnit.SECONDS)
+  @Measurement(time = 5, iterations = 6, timeUnit = TimeUnit.SECONDS)
   def cosineSimilarityJep338FullMask(f: BenchFixtures): Unit =
     f.jep338FullMask.cosineSimilarity(f.v1, f.v2)
 
   @Benchmark
   @BenchmarkMode(Array(Mode.Throughput))
   @Fork(value = 1)
-  @Warmup(time = 5, iterations = 3)
-  @Measurement(time = 5, iterations = 6)
+  @Warmup(time = 5, iterations = 3, timeUnit = TimeUnit.SECONDS)
+  @Measurement(time = 5, iterations = 6, timeUnit = TimeUnit.SECONDS)
   def cosineSimilarityJep338TailLoop(f: BenchFixtures): Unit =
     f.jep338TailLoop.cosineSimilarity(f.v1, f.v2)
 
   @Benchmark
   @BenchmarkMode(Array(Mode.Throughput))
   @Fork(value = 1)
-  @Warmup(time = 5, iterations = 3)
-  @Measurement(time = 5, iterations = 6)
+  @Warmup(time = 5, iterations = 3, timeUnit = TimeUnit.SECONDS)
+  @Measurement(time = 5, iterations = 6, timeUnit = TimeUnit.SECONDS)
   def cosineSimilarityJep338TailMask(f: BenchFixtures): Unit =
     f.jep338TailMask.cosineSimilarity(f.v1, f.v2)
 
   @Benchmark
   @BenchmarkMode(Array(Mode.Throughput))
   @Fork(value = 1)
-  @Warmup(time = 5, iterations = 3)
-  @Measurement(time = 5, iterations = 6)
+  @Warmup(time = 5, iterations = 3, timeUnit = TimeUnit.SECONDS)
+  @Measurement(time = 5, iterations = 6, timeUnit = TimeUnit.SECONDS)
   def dotProductBaseline(f: BenchFixtures): Unit =
     f.baseline.dotProduct(f.v1, f.v2)
 
   @Benchmark
   @BenchmarkMode(Array(Mode.Throughput))
   @Fork(value = 1)
-  @Warmup(time = 5, iterations = 3)
-  @Measurement(time = 5, iterations = 6)
+  @Warmup(time = 5, iterations = 3, timeUnit = TimeUnit.SECONDS)
+  @Measurement(time = 5, iterations = 6, timeUnit = TimeUnit.SECONDS)
   def dotProductFma(f: BenchFixtures): Unit =
     f.fma.dotProduct(f.v1, f.v2)
 
   @Benchmark
   @BenchmarkMode(Array(Mode.Throughput))
   @Fork(value = 1)
-  @Warmup(time = 5, iterations = 3)
-  @Measurement(time = 5, iterations = 6)
+  @Warmup(time = 5, iterations = 3, timeUnit = TimeUnit.SECONDS)
+  @Measurement(time = 5, iterations = 6, timeUnit = TimeUnit.SECONDS)
   def dotProductJep338FullMask(f: BenchFixtures): Unit =
     f.jep338FullMask.dotProduct(f.v1, f.v2)
 
   @Benchmark
   @BenchmarkMode(Array(Mode.Throughput))
   @Fork(value = 1)
-  @Warmup(time = 5, iterations = 3)
-  @Measurement(time = 5, iterations = 6)
+  @Warmup(time = 5, iterations = 3, timeUnit = TimeUnit.SECONDS)
+  @Measurement(time = 5, iterations = 6, timeUnit = TimeUnit.SECONDS)
   def dotProductJep338TailLoop(f: BenchFixtures): Unit =
     f.jep338TailLoop.dotProduct(f.v1, f.v2)
 
   @Benchmark
   @BenchmarkMode(Array(Mode.Throughput))
   @Fork(value = 1)
-  @Warmup(time = 5, iterations = 3)
-  @Measurement(time = 5, iterations = 6)
+  @Warmup(time = 5, iterations = 3, timeUnit = TimeUnit.SECONDS)
+  @Measurement(time = 5, iterations = 6, timeUnit = TimeUnit.SECONDS)
   def dotProductJep338TailMask(f: BenchFixtures): Unit =
     f.jep338TailMask.dotProduct(f.v1, f.v2)
 
   @Benchmark
   @BenchmarkMode(Array(Mode.Throughput))
   @Fork(value = 1)
-  @Warmup(time = 5, iterations = 3)
-  @Measurement(time = 5, iterations = 6)
+  @Warmup(time = 5, iterations = 3, timeUnit = TimeUnit.SECONDS)
+  @Measurement(time = 5, iterations = 6, timeUnit = TimeUnit.SECONDS)
   def l1DistanceBaseline(f: BenchFixtures): Unit =
     f.baseline.l1Distance(f.v1, f.v2)
 
   @Benchmark
   @BenchmarkMode(Array(Mode.Throughput))
   @Fork(value = 1)
-  @Warmup(time = 5, iterations = 3)
-  @Measurement(time = 5, iterations = 6)
+  @Warmup(time = 5, iterations = 3, timeUnit = TimeUnit.SECONDS)
+  @Measurement(time = 5, iterations = 6, timeUnit = TimeUnit.SECONDS)
   def l1DistanceFma(f: BenchFixtures): Unit =
     f.fma.l1Distance(f.v1, f.v2)
 
   @Benchmark
   @BenchmarkMode(Array(Mode.Throughput))
   @Fork(value = 1)
-  @Warmup(time = 5, iterations = 3)
-  @Measurement(time = 5, iterations = 6)
+  @Warmup(time = 5, iterations = 3, timeUnit = TimeUnit.SECONDS)
+  @Measurement(time = 5, iterations = 6, timeUnit = TimeUnit.SECONDS)
   def l1DistanceJep338FullMask(f: BenchFixtures): Unit =
     f.jep338FullMask.l1Distance(f.v1, f.v2)
 
   @Benchmark
   @BenchmarkMode(Array(Mode.Throughput))
   @Fork(value = 1)
-  @Warmup(time = 5, iterations = 3)
-  @Measurement(time = 5, iterations = 6)
+  @Warmup(time = 5, iterations = 3, timeUnit = TimeUnit.SECONDS)
+  @Measurement(time = 5, iterations = 6, timeUnit = TimeUnit.SECONDS)
   def l1DistanceJep338TailLoop(f: BenchFixtures): Unit =
     f.jep338TailLoop.l1Distance(f.v1, f.v2)
 
   @Benchmark
   @BenchmarkMode(Array(Mode.Throughput))
   @Fork(value = 1)
-  @Warmup(time = 5, iterations = 3)
-  @Measurement(time = 5, iterations = 6)
+  @Warmup(time = 5, iterations = 3, timeUnit = TimeUnit.SECONDS)
+  @Measurement(time = 5, iterations = 6, timeUnit = TimeUnit.SECONDS)
   def l1DistanceJep338TailMask(f: BenchFixtures): Unit =
     f.jep338TailMask.l1Distance(f.v1, f.v2)
 
   @Benchmark
   @BenchmarkMode(Array(Mode.Throughput))
   @Fork(value = 1)
-  @Warmup(time = 5, iterations = 3)
-  @Measurement(time = 5, iterations = 6)
+  @Warmup(time = 5, iterations = 3, timeUnit = TimeUnit.SECONDS)
+  @Measurement(time = 5, iterations = 6, timeUnit = TimeUnit.SECONDS)
   def l2DistanceBaseline(f: BenchFixtures): Unit =
     f.baseline.l2Distance(f.v1, f.v2)
 
   @Benchmark
   @BenchmarkMode(Array(Mode.Throughput))
   @Fork(value = 1)
-  @Warmup(time = 5, iterations = 3)
-  @Measurement(time = 5, iterations = 6)
+  @Warmup(time = 5, iterations = 3, timeUnit = TimeUnit.SECONDS)
+  @Measurement(time = 5, iterations = 6, timeUnit = TimeUnit.SECONDS)
   def l2DistanceFma(f: BenchFixtures): Unit =
     f.fma.l2Distance(f.v1, f.v2)
 
   @Benchmark
   @BenchmarkMode(Array(Mode.Throughput))
   @Fork(value = 1)
-  @Warmup(time = 5, iterations = 3)
-  @Measurement(time = 5, iterations = 6)
+  @Warmup(time = 5, iterations = 3, timeUnit = TimeUnit.SECONDS)
+  @Measurement(time = 5, iterations = 6, timeUnit = TimeUnit.SECONDS)
   def l2DistanceJep338FullMask(f: BenchFixtures): Unit =
     f.jep338FullMask.l2Distance(f.v1, f.v2)
 
   @Benchmark
   @BenchmarkMode(Array(Mode.Throughput))
   @Fork(value = 1)
-  @Warmup(time = 5, iterations = 3)
-  @Measurement(time = 5, iterations = 6)
+  @Warmup(time = 5, iterations = 3, timeUnit = TimeUnit.SECONDS)
+  @Measurement(time = 5, iterations = 6, timeUnit = TimeUnit.SECONDS)
   def l2DistanceJep338TailLoop(f: BenchFixtures): Unit =
     f.jep338TailLoop.l2Distance(f.v1, f.v2)
 
   @Benchmark
   @BenchmarkMode(Array(Mode.Throughput))
   @Fork(value = 1)
-  @Warmup(time = 5, iterations = 3)
-  @Measurement(time = 5, iterations = 6)
+  @Warmup(time = 5, iterations = 3, timeUnit = TimeUnit.SECONDS)
+  @Measurement(time = 5, iterations = 6, timeUnit = TimeUnit.SECONDS)
   def l2DistanceJep338TailMask(f: BenchFixtures): Unit =
     f.jep338TailMask.l2Distance(f.v1, f.v2)
 
