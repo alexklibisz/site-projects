@@ -18,11 +18,13 @@ class VectorOperationsSpec extends AnyFreeSpec with Matchers {
   private def checkParity(
     f1: (Array[Float], Array[Float]) => Double,
     f2: (Array[Float], Array[Float]) => Double,
-    vectorLength: Int = 999,
+    minVectorLength: Int = 1,
+    maxVectorLength: Int = 999,
     numVectors: Int = 1000,
     tolerance: Double = 0.005): Unit =
     (1 to numVectors)
-      .map(_ => (randomVector(vectorLength), randomVector(vectorLength)))
+      .map(_ => rng.between(minVectorLength, maxVectorLength))
+      .map(length => (randomVector(length), randomVector(length)))
       .foreach {
         case (v1, v2) =>
           val r1 = f1(v1, v2)
