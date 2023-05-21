@@ -13,9 +13,8 @@ public class Jep338FullMaskVectorOperations implements VectorOperations{
         double dotProd = 0.0;
         double v1SqrSum = 0.0;
         double v2SqrSum = 0.0;
-        int bound = species.loopBound(v1.length);
         FloatVector fv1, fv2;
-        for (int i = 0; i < bound; i += species.length()) {
+        for (int i = 0; i < v1.length; i += species.length()) {
             VectorMask<Float> m = species.indexInRange(i, v1.length);
             fv1 = FloatVector.fromArray(species, v1, i, m);
             fv2 = FloatVector.fromArray(species, v2, i, m);
