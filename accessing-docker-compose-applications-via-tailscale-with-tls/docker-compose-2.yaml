@@ -1,0 +1,19 @@
+services:
+  joplin:
+    image: joplin/server:3.0.1-beta
+    restart: unless-stopped
+    environment:
+      - APP_PORT=80
+      - APP_BASE_URL=http://localhost:8080
+    ports:
+      - 8080:80
+  tailscale:
+    image: tailscale/tailscale:v1.72.1
+    volumes:
+      - tailscale:/var/run/tailscale
+    environment:
+      - TS_HOSTNAME=joplin-server
+      - TS_STATE_DIR=/var/run/tailscale
+    restart: unless-stopped
+volumes:
+  tailscale:
